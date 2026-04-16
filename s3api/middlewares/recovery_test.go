@@ -54,6 +54,9 @@ func TestPanicRecovery_RecoversPanic(t *testing.T) {
 	}
 }
 
+// TestPanicRecovery_IncludesRequestID verifies that when PanicRecovery is
+// wrapped by RequestID middleware, the recovered panic log entry includes
+// the request_id field for easier tracing in logs.
 func TestPanicRecovery_IncludesRequestID(t *testing.T) {
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewTextHandler(&buf, nil))
