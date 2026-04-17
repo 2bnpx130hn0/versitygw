@@ -23,7 +23,8 @@ func (rw *responseWriter) WriteHeader(code int) {
 
 // RequestLogger returns a middleware that logs incoming HTTP requests
 // along with their method, path, status code, duration, and request ID.
-// Note: uses Warn level for 4xx/5xx responses to make errors easier to spot in logs.
+// Note: uses Warn level for 4xx responses and Error level for 5xx responses
+// to make it easier to distinguish client errors from server errors in logs.
 func RequestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -43,9 +44,12 @@ func RequestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 				slog.String("remote_addr", r.RemoteAddr),
 			}
 
-			if rw.statusCode >= 400 {
+			switch {
+			case rw.statusCode >= 500:
+				logger.ErrorContext(r.Context(), "request completed", attrs...)
+			case rw.statusCode >= 400:
 				logger.WarnContext(r.Context(), "request completed", attrs...)
-			} else {
+			default:
 				logger.InfoContext(r.Context(), "request completed", attrs...)
 			}
 		})
