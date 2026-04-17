@@ -78,3 +78,27 @@ func TestPanicRecovery_IncludesRequestID(t *testing.T) {
 		t.Errorf("expected log to contain request_id, got: %s", logOutput)
 	}
 }
+
+// TestPanicRecovery_PanicWithNonString checks that non-string panic values
+// (e.g. an error or integer) are also captured correctly in the log output.
+func TestPanicRecovery_PanicWithNonString(t *testing.T) {
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewTextHandler(&buf, nil))
+
+	handler := PanicRecovery(logger)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		panic(42)
+	}))
+
+	req := httptest.NewRequest(http.MethodGet, "/panic-int", nil)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("expected status 500, got %d", rec.Code)
+	}
+
+	logOutput := buf.String()
+	if !strings.Contains(logOutput, "panic recovered") {
+		t.Errorf("expected log to contain 'panic recovered', got: %s", logOutput)
+	}
+}
