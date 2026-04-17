@@ -18,8 +18,10 @@ func TestGenerateRequestID_Length(t *testing.T) {
 }
 
 func TestGenerateRequestID_Uniqueness(t *testing.T) {
-	ids := make(map[string]struct{}, 100)
-	for i := 0; i < 100; i++ {
+	// Increased iterations from 100 to 1000 for stronger uniqueness guarantee
+	const iterations = 1000
+	ids := make(map[string]struct{}, iterations)
+	for i := 0; i < iterations; i++ {
 		id, err := GenerateRequestID()
 		if err != nil {
 			t.Fatalf("unexpected error on iteration %d: %v", i, err)
