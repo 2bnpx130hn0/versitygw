@@ -91,3 +91,31 @@ func TestRequestLogger_CapturesNonOKStatus(t *testing.T) {
 		t.Errorf("expected status %d, got %v", http.StatusNotFound, logEntry["status"])
 	}
 }
+
+// TestRequestLogger_LogsMethod verifies that the HTTP method is always present
+// in the log entry, regardless of which method is used.
+func TestRequestLogger_LogsMethod(t *testing.T) {
+	for _, method := range []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodHead} {
+		t.Run(method, func(t *testing.T) {
+			var buf bytes.Buffer
+			logger := newTestLogger(&buf)
+
+			handler := RequestLogger(logger)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}))
+
+			req := httptest.NewRequest(method, "/probe", nil)
+			rr := httptest.NewRecorder()
+			handler.ServeHTTP(rr, req)
+
+			var logEntry map[string]any
+			if err := json.Unmarshal(buf.Bytes(), &logEntry); err != nil {
+				t.Fatalf("failed to parse log output: %v", err)
+			}
+
+			if logEntry["method"] != method {
+				t.Errorf("expected method %q, got %q", method, logEntry["method"])
+			}
+		})
+	}
+}
