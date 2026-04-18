@@ -18,7 +18,7 @@ func TestGenerateRequestID_Length(t *testing.T) {
 }
 
 func TestGenerateRequestID_Uniqueness(t *testing.T) {
-	// Increased iterations from 100 to 1000 for stronger uniqueness guarantee
+	// 1000 iterations provides a strong uniqueness guarantee without being slow
 	const iterations = 1000
 	ids := make(map[string]struct{}, iterations)
 	for i := 0; i < iterations; i++ {
@@ -58,6 +58,7 @@ func TestRequestIDMiddleware_PreservesClientHeader(t *testing.T) {
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
 
+	// The middleware should echo back the client-supplied ID rather than overwriting it
 	if got := rec.Header().Get("X-Amz-Request-Id"); got != clientID {
 		t.Errorf("expected %q, got %q", clientID, got)
 	}
