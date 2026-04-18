@@ -95,7 +95,9 @@ func TestRequestLogger_CapturesNonOKStatus(t *testing.T) {
 // TestRequestLogger_LogsMethod verifies that the HTTP method is always present
 // in the log entry, regardless of which method is used.
 func TestRequestLogger_LogsMethod(t *testing.T) {
-	for _, method := range []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodHead} {
+	// covering the most common S3 methods: GET, POST, PUT, DELETE, HEAD
+	for _, method := range []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodHead} {
+		method := method
 		t.Run(method, func(t *testing.T) {
 			var buf bytes.Buffer
 			logger := newTestLogger(&buf)
@@ -104,7 +106,7 @@ func TestRequestLogger_LogsMethod(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 			}))
 
-			req := httptest.NewRequest(method, "/probe", nil)
+			req := httptest.NewRequest(method, "/", nil)
 			rr := httptest.NewRecorder()
 			handler.ServeHTTP(rr, req)
 
