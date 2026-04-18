@@ -34,14 +34,17 @@ func RequestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 			next.ServeHTTP(rw, r)
 
 			requestID := GetRequestID(r.Context())
+			duration := time.Since(start)
 
 			attrs := []any{
 				slog.String("method", r.Method),
 				slog.String("path", r.URL.Path),
 				slog.Int("status", rw.statusCode),
-				slog.Duration("duration", time.Since(start)),
+				slog.Duration("duration", duration),
 				slog.String("request_id", requestID),
 				slog.String("remote_addr", r.RemoteAddr),
+				// include query string to help with debugging presigned URL issues
+				slog.String("query", r.URL.RawQuery),
 			}
 
 			switch {
