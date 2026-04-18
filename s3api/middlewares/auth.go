@@ -84,8 +84,8 @@ func AuthParser() fiber.Handler {
 			meta = ParseV4AuthHeader(authHeader)
 		case AuthTypeV2:
 			meta = AuthMetadata{Type: AuthTypeV2}
-			// V: AWS <access>:<signature>
-			parts := strings.SplitN(strings.TrimPrefix(authHeader, "AWS "),:", 2)
+			// V2 format: AWS <access>:<signature>
+			parts := strings.SplitN(strings.TrimPrefix(authHeader, "AWS "), ":", 2)
 			if len(parts) == 2 {
 				meta.AccessKey = parts[0]
 			}
@@ -107,13 +107,4 @@ func GetAuthMetadata(c *fiber.Ctx) AuthMetadata {
 	return AuthMetadata{Type: AuthTypeUnknown}
 }
 
-// RequireAuth is a middleware that rejects anonymous requests with a 403.
-func RequireAuth() fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		meta := GetAuthMetadata(c)
-		if meta.Type == AuthTypeAnonymous || meta.Type == AuthTypeUnknown {
-			return c.Status(http.StatusForbidden).SendString("Access Denied")
-		}
-		return c.Next()
-	}
-}
+// RequireAuth is a middleware that rejects ano
