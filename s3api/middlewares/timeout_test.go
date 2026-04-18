@@ -37,8 +37,8 @@ func TestRequestTimeout_CompletesBeforeDeadline(t *testing.T) {
 func TestRequestTimeout_ExceedsDeadline(t *testing.T) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// sleep longer than the timeout to reliably trigger the deadline
-		// using 500ms sleep vs 50ms timeout gives a comfortable margin
-		time.Sleep(500 * time.Millisecond)
+		// using 1s sleep vs 50ms timeout gives a more comfortable margin
+		time.Sleep(1 * time.Second)
 		w.WriteHeader(http.StatusOK)
 	})
 
@@ -60,8 +60,8 @@ func TestRequestTimeout_ExceedsDeadline(t *testing.T) {
 func TestRequestTimeout_SetsRequestIDOnTimeout(t *testing.T) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// sleep longer than the timeout to reliably trigger the deadline
-		// using 500ms sleep vs 50ms timeout gives a comfortable margin
-		time.Sleep(500 * time.Millisecond)
+		// using 1s sleep vs 50ms timeout gives a more comfortable margin
+		time.Sleep(1 * time.Second)
 		w.WriteHeader(http.StatusOK)
 	})
 
