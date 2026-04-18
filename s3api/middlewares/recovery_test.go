@@ -101,7 +101,7 @@ func TestPanicRecovery_PanicWithNonString(t *testing.T) {
 	if !strings.Contains(logOutput, "panic recovered") {
 		t.Errorf("expected log to contain 'panic recovered', got: %s", logOutput)
 	}
-	// also verify the integer value is represented in the log
+	// also verify the integer panic value appears in the log
 	if !strings.Contains(logOutput, "42") {
 		t.Errorf("expected log to contain panic value '42', got: %s", logOutput)
 	}
