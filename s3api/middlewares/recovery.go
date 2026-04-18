@@ -26,8 +26,10 @@ func PanicRecovery(logger *slog.Logger) func(http.Handler) http.Handler {
 						"stack", string(stack),
 					)
 
-					w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+					// Use WriteHeader instead of http.Error to avoid including the
+					// status text in the body, which can leak implementation details.
+					w.Header().Set("Content-Type", "application/xml")
+					w.WriteHeader(http.StatusInternalServerError)
 				}
 			}()
 
