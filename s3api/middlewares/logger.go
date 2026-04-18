@@ -40,7 +40,8 @@ func RequestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 				slog.String("method", r.Method),
 				slog.String("path", r.URL.Path),
 				slog.Int("status", rw.statusCode),
-				slog.Duration("duration", duration),
+				// log duration in milliseconds for easier reading in log aggregators
+				slog.Float64("duration_ms", float64(duration.Microseconds())/1000.0),
 				slog.String("request_id", requestID),
 				slog.String("remote_addr", r.RemoteAddr),
 				// include query string to help with debugging presigned URL issues
