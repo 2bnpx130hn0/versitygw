@@ -46,6 +46,8 @@ func RequestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
 				slog.String("remote_addr", r.RemoteAddr),
 				// include query string to help with debugging presigned URL issues
 				slog.String("query", r.URL.RawQuery),
+				// include User-Agent to help identify clients and SDKs in use
+				slog.String("user_agent", r.UserAgent()),
 			}
 
 			switch {
