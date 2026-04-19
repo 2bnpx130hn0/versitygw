@@ -10,11 +10,12 @@ import (
 
 const (
 	// DefaultRequestTimeout is the default timeout for incoming S3 requests.
-	DefaultRequestTimeout = 30 * time.Second
+	// Increased from 30s to 60s to better handle large object uploads on slow connections.
+	DefaultRequestTimeout = 60 * time.Second
 )
 
 // RequestTimeout returns a middleware that cancels the request context
-// after the specified duration. If duration is zero, DefaultRequestTimeout
+// after the specified duration. If duration is zero or negative, DefaultRequestTimeout
 // is used.
 func RequestTimeout(timeout time.Duration) func(http.Handler) http.Handler {
 	if timeout <= 0 {
